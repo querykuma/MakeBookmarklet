@@ -1,5 +1,5 @@
 // import * as a from './a.js';
-import a from './a.js';
+import a from "./a.js";
 // const { p, q } = a;
 
 // この形式のコメントがあってもブックマークレットを実行できることのテスト。

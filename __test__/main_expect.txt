@@ -1,1 +1,1 @@
-javascript:(()=>{"use strict";console.log("a\t\t\t\t\tb"),console.log(12)})();
+javascript:/* __REPLACE__ */(()=>{"use strict";console.log("a\t\t\t\t\tb"),console.log(12)})();

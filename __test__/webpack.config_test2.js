@@ -1,6 +1,6 @@
-const MakeBookmarklet = require("./MakeBookmarklet.js");
+const MakeBookmarklet = require("../MakeBookmarklet.js");
 
-const o_package = require("./package.json");
+const o_package = require("../package.json");
 
 module.exports = {
 	"plugins": [

@@ -1,11 +1,11 @@
 const fs = require("fs");
 const path = require("path");
 const webpack = require("webpack");
-const o_package = require("./package.json");
+const o_package = require("../package.json");
 
 const config = {
-	// "mode": "development",
-	"entry": path.resolve(__dirname, "src/index.js"),
+	"mode": "development",
+	"entry": path.resolve(__dirname, "../src/index.js"),
 	"output": {
 		"filename": "node_output.js"
 	}

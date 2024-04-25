@@ -1,8 +1,14 @@
-const fs = require('fs');
+/**
+ * @file MakeBookmarklet.js
+ * @version: 1.1.0
+ */
+
+const fs = require("fs");
 
 class MakeBookmarklet {
 	static o_defaultOptions = {
-		"f_encodeURIComponent": false
+		"f_encodeURIComponent": true,
+		"s_banner": ""
 	};
 
 	constructor(o_options) {
@@ -22,17 +28,25 @@ class MakeBookmarklet {
 				return;
 			}
 
-			const s_content = o_info.content.toString('utf8');
+			const s_content = o_info.content.toString("utf8");
 
-			if (!s_content.match(/^\(\(\)=>\{.*\}\)\(\);$/u)) {
+			const { mode } = o_info.compilation.options;
+
+			if ((mode === void 0 || mode === "production")
+				&& !s_content.match(/^\(\(\)=>\{.*\}\)\(\);$/u)) {
+				/**
+				 * developmentはコメントが多いのでproduction modeのときのみチェックする。
+				 * 設定ファイルや引数で指定しなかった場合、modeがundefinedで、production modeになる。
+				 */
 				console.log(`${s_filename} の中身が予期されない形をしています。`);
 				return;
 			}
 
+			const s_preceding = `javascript:${this.o_options.s_banner ? `/* ${this.o_options.s_banner} */` : ""}`;
 			const s_content2
 				= this.o_options.f_encodeURIComponent
-					? `javascript:${encodeURIComponent(s_content)}`
-					: `javascript:${s_content}`;
+					? `${s_preceding}${encodeURIComponent(s_content)}`
+					: `${s_preceding}${s_content}`;
 
 			fs.stat(s_targetPath, (err, stats) => {
 				if (err) { throw err; }
@@ -44,7 +58,7 @@ class MakeBookmarklet {
 				fs.unlink(s_targetPath, (err2) => {
 					if (err2) { throw err2; }
 
-					fs.writeFile(s_targetPath, s_content2, 'utf8', (err3) => {
+					fs.writeFile(s_targetPath, s_content2, "utf8", (err3) => {
 						if (err3) { throw err3; }
 						console.log(`${s_filename} をbookmarkletにしました。`);
 					});

@@ -19,20 +19,20 @@ let expect_file_content_equal = (s_file1, s_file2) => {
 	expect(s_content1).toEqual(s_content2.replace(/__REPLACE__/u, `v${o_package.version}`));
 };
 
-test("node_webpack.js production f_encodeURIComponent=false", (done) => {
-	let s_command = `node ${path.resolve(__dirname, "node_webpack_test1.js")}`;
+test("node_webpack.js development f_encodeURIComponent=true", (done) => {
+	let s_command = `node ${path.resolve(__dirname, "node_webpack_test2.js")}`;
 	let s_result = cp.execSync(s_command).toString();
 	console.log(s_result);
 
-	expect_file_content_equal("node_output.js", "main_expect.txt");
+	expect_file_content_equal("node_output.js", "main_expect2.txt");
 	done();
 });
 
-test("webpack production f_encodeURIComponent=false", (done) => {
-	let s_command = "npx webpack --mode production -c __test__/webpack.config_test1.js";
+test("webpack development f_encodeURIComponent=true", (done) => {
+	let s_command = "npx webpack --mode development -c __test__/webpack.config_test2.js";
 	let s_result = cp.execSync(s_command).toString();
 	console.log(s_result);
 
-	expect_file_content_equal("main.js", "main_expect.txt");
+	expect_file_content_equal("main.js", "main_expect2.txt");
 	done();
 });

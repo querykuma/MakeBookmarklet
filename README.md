@@ -1,31 +1,15 @@
 # MakeBookmarklet
 
-MakeBookmarkletはwebpackでブックマークレットを出力するプログラムです。
+MakeBookmarkletはブックマークレットを出力するwebpackのプラグインです。
 
 ## 機能
 
-- 「javascript:」のラベルを出力ファイルの先頭につけます。
-- 任意のコメントを出力ファイルの先頭につけます。
+- 「javascript:」のラベルを出力ファイルの先頭に挿入します。
+- 任意のコメント（s_banner）を出力ファイルの先頭に挿入します。
 
-## 準備
+## 使い方
 
-package.jsonのdevDependenciesにあるnpmのパッケージ（主にwebpackとwebpack-cli）をインストールします。
-
-```shell
-npm install
-```
-
-## 主なファイル
-
-主なファイルは2つです。MakeBookmarklet.jsとnode_webpack.jsです。
-
-### MakeBookmarklet.js
-
-MakeBookmarklet.jsはwebpackのプラグインです。
-
-#### 使い方
-
-MakeBookmarklet.jsをフォルダに配置してからwebpack.config.jsのpluginsに次のように書いてください。
+MakeBookmarklet.jsを適切なフォルダに配置し、webpack.config.jsのpluginsに次のように書いてください。webpackを実行するときにMakeBookmarklet.jsを呼び出します。
 
 ```javascript
 const MakeBookmarklet = require('./MakeBookmarklet.js');
@@ -34,42 +18,55 @@ module.exports = {
 	"plugins": [
 		new MakeBookmarklet({
 			"f_encodeURIComponent": false,
-            "s_banner": "hoge"
+			"s_banner": "hoge"
 		})
 	]
 };
 ```
 
+`npx webpack`のコマンドでwebpackを実行すればブックマークレットを出力します。
+
+## オプション
+
+new MakeBookmarkletの引数でオプションを指定できます。
+
+### f_encodeURIComponent
+
 オプション**f_encodeURIComponent**をfalseにするとブックマークレットの中身をencodeURIComponentしません。f_encodeURIComponentの初期値はtrueです。
 
-production modeのときは必要ありませんが、development modeのときはencodeURIComponentが必要になります。
+production modeのときは必須ではありませんが、development modeのときはencodeURIComponentが必須になります。
 
-オプション**s_banner**に空文字列以外を指定すると「javascript:/* hoge */(()=>{})();」のようになって出力ファイルの先頭にコメントが挿入されます。s_bannerの初期値は空文字列です。
+### s_banner
 
+オプション**s_banner**に空文字列以外の文字列を指定すると出力ファイルの先頭にコメントを挿入します。出力ファイルは「javascript:/* hoge */(()=>{})();」の形式になります。s_bannerの初期値は空文字列です。
 
+複数ファイルに対して異なるs_bannerをつけるため、v1.2.0からs_bannerにオブジェクトを指定できるようになりました。
 
-```shell
-npx webpack
-または
-npx webpack watch
+次の例は、"src/index.js"にs_banner "v1.2.3"、"src/index2.js"にs_banner "v0.1.2"を指定しています。
+
+```javascript
+const path = require("path");
+const MakeBookmarklet = require("./MakeBookmarklet.js");
+
+module.exports = {
+	"mode": "production",
+	"context": path.resolve(__dirname, "src"),
+	"entry": {
+		"index": "./index.js",
+		"index2": "./index2.js"
+	},
+	"output": {
+		"filename": "[name]_min.js",
+		"path": path.resolve(__dirname, "dist")
+	},
+	"plugins": [
+		new MakeBookmarklet({
+			"f_encodeURIComponent": false,
+			"s_banner": {
+				"index": "v1.2.3",
+				"index2": "v0.1.2"
+			}
+		})
+	]
+};
 ```
-
-で実行してください。
-
-### node_webpack.js
-
-node_webpack.jsはノードインタフェースを使ってNode.jsからwebpackを実行するプログラムです。
-
-#### 使い方
-
-変数**config**で入力ファイルと出力ファイルを設定できます。
-
-変数**f_encodeURIComponent**をtrueにするとブックマークレットのファイルの中身をencodeURIComponentします。falseにするとencodeURIComponentしません。
-
-変数**s_banner**に空文字列以外を指定すると「javascript:/* hoge */(()=>{})();」のようになって出力ファイルの先頭にコメントを挿入します。空文字列を指定すると、コメントを挿入しません。
-
-```shell
-node node_webpack.js
-```
-
-で実行してください。

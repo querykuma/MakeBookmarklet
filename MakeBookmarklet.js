@@ -1,6 +1,6 @@
 /**
  * @file MakeBookmarklet.js
- * @version: 1.1.0
+ * @version: 1.2.0
  */
 
 const fs = require("fs");
@@ -16,6 +16,49 @@ class MakeBookmarklet {
 			...MakeBookmarklet.o_defaultOptions,
 			...o_options
 		};
+	}
+
+	/**
+	 * 出力ファイル名s_filenameに対応するs_bannerを返す。
+	 * webpack.config.jsのpluginsのnew MakeBookmarkletのs_bannerに
+	 *  指定がなければ""を返す。
+	 *  文字列が指定してあれば文字列を返す。
+	 *  対応関係を示すオブジェクトが指定してあれば対応する文字列を返す。
+	 */
+	get_banner(s_filename, o_info) {
+		const { s_banner } = this.o_options;
+
+		if (!s_banner) {
+			return "";
+		}
+
+		if (typeof (s_banner) === "string") {
+			return s_banner;
+		}
+
+		if (typeof (s_banner) !== "object"
+			|| s_banner.constructor !== Object) {
+			return "";
+		}
+
+		let I_entrypoints = o_info.compilation.entrypoints.entries();
+		let o_entrypoint;
+
+		// eslint-disable-next-line no-sequences
+		while (o_entrypoint = I_entrypoints.next(), !o_entrypoint.done) {
+			const a_value = o_entrypoint.value;
+			let s_files = a_value[1].getFiles();
+
+			if (s_files.length !== 1) {
+				console.log(`MakeBookmarkletにて予期されない形に会いました。s_files.length = ${s_files.length}`);
+			}
+
+			if (s_files[0] === s_filename) {
+				return s_banner[a_value[0]];
+			}
+		}
+
+		return "";
 	}
 
 	apply(compiler) {
@@ -42,7 +85,9 @@ class MakeBookmarklet {
 				return;
 			}
 
-			const s_preceding = `javascript:${this.o_options.s_banner ? `/* ${this.o_options.s_banner} */` : ""}`;
+			let s_banner = this.get_banner(s_filename, o_info);
+
+			const s_preceding = `javascript:${s_banner && `/* ${s_banner} */`}`;
 			const s_content2
 				= this.o_options.f_encodeURIComponent
 					? `${s_preceding}${encodeURIComponent(s_content)}`

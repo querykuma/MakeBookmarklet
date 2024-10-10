@@ -3,7 +3,6 @@ const fs = require("fs");
 const path = require("path");
 const cp = require("child_process");
 const o_package = require("../package.json");
-const node_webpack = require("../node_webpack");
 
 /**
  * ファイルの中身の一致をテストする。
@@ -20,30 +19,12 @@ let expect_file_content_equal = (s_file1, s_file2) => {
 	expect(s_content1).toEqual(s_content2.replace(/__REPLACE__/u, `v${o_package.version}`));
 };
 
-test("node_webpack.js development f_encodeURIComponent=true", async () => {
-	try {
-		const f_encodeURIComponent = true;
-		const s_banner = `v${o_package.version}`;
-		await node_webpack({
-			"mode": "development",
-			"entry": path.resolve(__dirname, "../src/index.js"),
-			"output": {
-				"filename": "node_output.js"
-			}
-		}, f_encodeURIComponent, s_banner);
-
-	} catch (error) {
-		console.log(error);
-	}
-
-	expect_file_content_equal("node_output.js", "main_expect2.txt");
-});
-
-test("webpack development f_encodeURIComponent=true", (done) => {
-	let s_command = "npx webpack --mode development -c __test__/webpack.config_test2.js";
+test("webpack s_banner is object", (done) => {
+	let s_command = "npx webpack -c __test__/webpack.config3.js";
 	let s_result = cp.execSync(s_command).toString();
 	console.log(s_result);
 
-	expect_file_content_equal("main.js", "main_expect2.txt");
+	expect_file_content_equal("index_min.js", "expect3-1.txt");
+	expect_file_content_equal("index2_min.js", "expect3-2.txt");
 	done();
 });

@@ -1,6 +1,6 @@
 /**
  * @file MakeBookmarklet.js
- * @version: 1.2.0
+ * @version: 1.2.1
  */
 
 const fs = require("fs");
@@ -54,7 +54,12 @@ class MakeBookmarklet {
 			}
 
 			if (s_files[0] === s_filename) {
-				return s_banner[a_value[0]];
+				let s_return = s_banner[a_value[0]];
+
+				if (s_return === void 0) {
+					return "";
+				}
+				return String(s_return);
 			}
 		}
 
